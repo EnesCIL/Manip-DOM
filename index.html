@@ -20,12 +20,18 @@
         </li>
     </ul> -->
 
-
+    <div id = "timer"></div>
     <div id = "board"></div>
 
 
-
-
+    <!-- <form id="input">
+        <div class="number">
+            <input type="number" min="1" max="10" /> 
+        </div>
+        <input type="submit" value="Envoyer"  />
+        
+    </form> -->
+    
 
     <script>
         // let list = document.querySelector("ul")
@@ -56,7 +62,7 @@
 
         function showReaction(type, clickedBox){
             clickedBox.classList.add(type)
-            if(type !== "succes"){
+            if(type !== "succes"){  //vérifie si ses deux opérandes ne sont pas égaux et renvoie un booléen correspondant au résultat
                 setTimeout(function(){
                     clickedBox.classList.remove(type)
                 }, 800)
@@ -67,17 +73,69 @@
         box.classList.add("box")
         
         const board = document.querySelector("#board")
-       let nb = 1
+        
+        
 
-        for(let i =1; i <=10; i++){
+        let nbNombrebox = prompt("choisir nombre de boite")
+        if(nbNombrebox>50){
+            nbNombrebox = 50
+        }
+
+        
+        // // on demande le nombre de boîtes au joueur
+        // let boxCount = parseInt(prompt("Combien de boîtes veux-tu ? (entre 1 et 50)"), 10)
+        // if (isNaN(boxCount) || boxCount < 1) {
+        //     boxCount = 10 // valeur par défaut
+        // } else if (boxCount > 50) {
+        //     boxCount = 50 // limite max pour éviter de casser l'affichage
+        // }
+        // function startTimer{
+        //     nbNombrebox = document.setInterval("#board")
+            
+        // }
+        // let secondes = 0
+        // let chrono = nbNombrebox.setInterval()
+        
+        // let timer = document.querySelector("#timer")
+        // timer = 0
+        
+        // setTimeout(function(){
+        //     nbNombrebox = document.setInterval("#board")
+        //     const t =setInterval(() =>{
+        //         console.log(n--)
+        //         n < 0 && clearInterval(t)
+        //     },1000)
+        // })
+
+        let timer = 0
+        let interval = null
+ 
+        function startTimer() {
+            interval = setInterval(() => {
+                timer++
+                document.getElementById("timer").innerText = timer + " s"
+            }, 1000)
+        }
+        
+        function stopTimer{
+            clearTimeout("stop"){
+                document.getElementById("timer").innerText = "stop"
+            }
+        }
+        
+        let nb = 1
+        for(let i =1; i <=nbNombrebox; i++){
             let newbox = box.cloneNode()
             newbox.innerText = i
+            startTimer()
             board.appendChild(newbox)
+            
+           
             
             newbox.addEventListener("click", function(){
                 if(i==nb){
                     newbox.classList.add("box-valid")
-                    //1
+                    shuffleChildren(board) 
                     if(nb == board.children.length){
                         board.querySelectorAll(".box").forEach(function(box){
                             showReaction("success", box)
@@ -85,15 +143,17 @@
                     }
                     nb++
                 }
-                //2
+
                 else if(i > nb){
                     showReaction("error", newbox)
+                    shuffleChildren(board) 
                     nb = 1
-                    board.querySelectorAll(".box-valid").forEach(function(validBox){
+                    board.querySelectorAll(".box-valid").forEach(function(validBox){  //recupere un tableau d'élément de board pour qsAll, et foreach pour passer sur charque element de validbox 
                         validBox.classList.remove("box-valid")
                     })
+
                 }
-                //3
+
                 else{
                     showReaction("notice", newbox)
                 }
