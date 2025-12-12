@@ -7,163 +7,205 @@
     <title>Document</title>
 </head>
 <body>
-    <!-- <h1>Description du DOM</h1>
-    <ul>
-        <li>
-            le DOM est une interface de programmation
-        </li>
-        <li>
-            L'acronyme signifie : Document Object Model
-        </li>
-        <li>
-            IL représente les noeuds interconnectés (balises) d'une page HTML
-        </li>
-    </ul> -->
 
-    <div id = "timer"></div>
-    <div id = "board"></div>
+    <!-- Zone où seront placées les cases du jeu -->
+    <div id="board"></div>
 
-
-    <!-- <form id="input">
-        <div class="number">
-            <input type="number" min="1" max="10" /> 
-        </div>
-        <input type="submit" value="Envoyer"  />
-        
-    </form> -->
-    
+    <!-- Zone où sera affiché le chronomètre -->
+    <div id="chrono" style="font-size: 2em; margin-top: 20px;"></div>
 
     <script>
-        // let list = document.querySelector("ul")
+        /*
+            Cette fonction mélange les enfants d’un élément HTML.
+            Un "enfant" est un élément contenu dans un autre.
+            Ici, board contient plusieurs div.box.
+        */
+        function shuffleChildren(parent) {
+            // parent.children est un HTMLCollection, une liste d'éléments.
+            let children = Array.from(parent.children); 
+            // Array.from permet de convertir la liste en véritable tableau manipulable.
 
-        // let listElements = list.querySelectorAll("li")
+            // On part de la fin du tableau pour aller jusqu'au début.
+            let i = children.length;
 
-        // console.log("la liste", list)
-        // console.log("les éléments", listElements)
+            // Boucle de Fisher-Yates (algorithme classique de mélange).
+            while (--i > 0) {
+                // k devient un index aléatoire entre 0 et i
+                let k = Math.floor(Math.random() * (i + 1));
 
-        // listElements.forEach(function(element){
-        //     console.dir(element)
-        //     element.style.color = "red"
-        // })
-        function shuffleChildren(parent){
-            let children = parent.children
-            let i = children.length, k, temps
-            while(--i > 0){// on boucle tant que 1 de i est toujours positif
-                //k stocke un nombre aléatoire basé sur i
-                k = Math.floor(Math.random() * (i+1))
-                //temp pointe temporairement l'élément à la postion i
-                temp = children[k]
-                //remplace l'élément à la position k par l'élément à la postion i
-                children[k] = children[i]
-                //place l'élément k pointé temporairement à la fin du contenu de board
-                parent.appendChild(temp)
+                // insertBefore permet d'échanger des éléments dans le DOM
+                parent.insertBefore(children[k], children[i]);
+
+                // On échange aussi dans le tableau local
+                let temp = children[i];
+                children[i] = children[k];
+                children[k] = temp;
             }
         }
 
-        function showReaction(type, clickedBox){
-            clickedBox.classList.add(type)
-            if(type !== "succes"){  //vérifie si ses deux opérandes ne sont pas égaux et renvoie un booléen correspondant au résultat
-                setTimeout(function(){
-                    clickedBox.classList.remove(type)
-                }, 800)
+        /*
+            Cette fonction affiche une réaction visuelle sur la case cliquée.
+            type est une chaîne de caractère: "success", "error", "notice".
+        */
+        function showReaction(type, clickedBox) {
+
+            // On ajoute une classe CSS à l'élément
+            clickedBox.classList.add(type);
+
+            // On retire la classe après 0.8 seconde si ce n’est pas une réussite
+            if (type !== "success") { 
+                setTimeout(function () {
+                    clickedBox.classList.remove(type);
+                }, 800);
             }
         }
 
-        const box = document.createElement("div")
-        box.classList.add("box")
-        
-        const board = document.querySelector("#board")
-        
-        
+        /*
+            Déclaration d'une variable avec let :
+            let permet de créer une variable dont la valeur peut changer.
+            Ici, on crée un modèle de case ("box") qui servira de base pour les clones.
+        */
+        const box = document.createElement("div");
+        box.classList.add("box");
 
-        let nbNombrebox = prompt("choisir nombre de boite")
-        if(nbNombrebox>50){
-            nbNombrebox = 50
+        /*
+            On récupère l’élément dans lequel seront placées toutes les cases.
+        */
+        const board = document.querySelector("#board");
+
+        /*
+            On demande au joueur combien de cases il souhaite.
+            prompt affiche une fenêtre avec un champ texte.
+            La valeur retournée est une chaîne de caractère,
+            donc il est nécessaire de la convertir en number.
+        */
+        let totalBoxes = parseInt(prompt("Combien de cases voulez-vous ? (ex: 10)"));
+
+        /*
+            Si l’utilisateur clique Annuler ou entre une valeur invalide
+            on force à 10 pour éviter une erreur.
+        */
+        if (isNaN(totalBoxes) || totalBoxes < 1) {
+            totalBoxes = 10;
         }
 
-        
-        // // on demande le nombre de boîtes au joueur
-        // let boxCount = parseInt(prompt("Combien de boîtes veux-tu ? (entre 1 et 50)"), 10)
-        // if (isNaN(boxCount) || boxCount < 1) {
-        //     boxCount = 10 // valeur par défaut
-        // } else if (boxCount > 50) {
-        //     boxCount = 50 // limite max pour éviter de casser l'affichage
-        // }
-        // function startTimer{
-        //     nbNombrebox = document.setInterval("#board")
-            
-        // }
-        // let secondes = 0
-        // let chrono = nbNombrebox.setInterval()
-        
-        // let timer = document.querySelector("#timer")
-        // timer = 0
-        
-        // setTimeout(function(){
-        //     nbNombrebox = document.setInterval("#board")
-        //     const t =setInterval(() =>{
-        //         console.log(n--)
-        //         n < 0 && clearInterval(t)
-        //     },1000)
-        // })
+        /*
+            Chronomètre :
+            startTime stockera l’heure du début du jeu.
+        */
+        let startTime = Date.now();
 
-        let timer = 0
-        let interval = null
- 
+        /*
+            startTimer est une fonction qui met à jour le chronomètre toutes les secondes.
+        */
         function startTimer() {
-            interval = setInterval(() => {
-                timer++
-                document.getElementById("timer").innerText = timer + " s"
-            }, 1000)
+            let chronoDiv = document.querySelector("#chrono");
+
+            setInterval(function () {
+                // Calcul du temps écoulé : maintenant - départ
+                let now = Date.now();
+                let elapsed = now - startTime;
+
+                // Conversion en secondes
+                let seconds = Math.floor(elapsed / 1000);
+
+                chronoDiv.textContent = "Temps : " + seconds + "s";
+
+            }, 1000);
         }
-        
-        function stopTimer{
-            clearTimeout("stop"){
-                document.getElementById("timer").innerText = "stop"
-            }
-        }
-        
-        let nb = 1
-        for(let i =1; i <=nbNombrebox; i++){
-            let newbox = box.cloneNode()
-            newbox.innerText = i
-            startTimer()
-            board.appendChild(newbox)
-            
-           
-            
-            newbox.addEventListener("click", function(){
-                if(i==nb){
-                    newbox.classList.add("box-valid")
-                    shuffleChildren(board) 
-                    if(nb == board.children.length){
-                        board.querySelectorAll(".box").forEach(function(box){
-                            showReaction("success", box)
-                        })
+
+        // Démarre le chronomètre dès le lancement du jeu
+        startTimer();
+
+        /*
+            nb représente le prochain nombre que le joueur doit cliquer.
+            On commence toujours par 1.
+        */
+        let nb = 1;
+
+        /*
+            Boucle for :
+            Cette boucle va de 1 jusqu'au nombre choisi par l’utilisateur.
+            Elle permet de créer chaque case numérotée.
+        */
+        for (let i = 1; i <= totalBoxes; i++) {
+
+            /*
+                cloneNode crée une copie de l'élément box.
+                Sans argument, cloneNode() copie seulement la balise mais pas l'intérieur.
+                Comme le modèle est simple, cela fonctionne.
+            */
+            let newbox = box.cloneNode();
+
+            // On place le numéro de la case à l’intérieur du div
+            newbox.innerText = i;
+
+            // On ajoute la case dans #board
+            board.appendChild(newbox);
+
+            /*
+                On ajoute un "écouteur d'événement" sur chaque case.
+                Cela signifie : quand cette case est cliquée, exécuter la fonction.
+            */
+            newbox.addEventListener("click", function () {
+
+                /*
+                    Premier cas : l'utilisateur clique la bonne case
+                    c’est-à-dire i correspond à nb
+                */
+                if (i == nb) {
+
+                    // On ajoute une classe CSS pour signifier que la case est validée
+                    newbox.classList.add("box-valid");
+
+                    /*
+                        Si la dernière case vient d'être validée,
+                        cela signifie que le joueur a réussi.
+                    */
+                    if (nb == board.children.length) {
+
+                        // On applique la classe de réussite sur toutes les cases
+                        board.querySelectorAll(".box").forEach(function (box) {
+                            showReaction("success", box);
+                        });
                     }
-                    nb++
+
+                    // On attend désormais le nombre suivant
+                    nb++;
                 }
 
-                else if(i > nb){
-                    showReaction("error", newbox)
-                    shuffleChildren(board) 
-                    nb = 1
-                    board.querySelectorAll(".box-valid").forEach(function(validBox){  //recupere un tableau d'élément de board pour qsAll, et foreach pour passer sur charque element de validbox 
-                        validBox.classList.remove("box-valid")
-                    })
+                /*
+                    Deuxième cas : l'utilisateur clique un nombre trop grand.
+                    Cela signifie une erreur.
+                */
+                else if (i > nb) {
+                    showReaction("error", newbox);
 
+                    // On réinitialise à 1
+                    nb = 1;
+
+                    // Toutes les cases validées redeviennent normales
+                    board.querySelectorAll(".box-valid").forEach(function (validBox) {
+                        validBox.classList.remove("box-valid");
+                    });
                 }
 
-                else{
-                    showReaction("notice", newbox)
+                /*
+                    Troisième cas : l'utilisateur clique un nombre trop petit.
+                    La case est déjà passée.
+                */
+                else {
+                    showReaction("notice", newbox);
                 }
-
-                
-            })
+            });
         }
 
-        shuffleChildren(board)
-        
-    </script> 
+        /*
+            On mélange toutes les cases une fois qu'elles sont générées.
+        */
+        shuffleChildren(board);
+
+    </script>
 </body>
 </html>
+ 
